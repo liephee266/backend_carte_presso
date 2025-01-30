@@ -1,18 +1,27 @@
-version: '3.8'
-
 services:
   php:
     build: .
-    ports:
-      - "9000:9000"
     volumes:
       - .:/var/www/project
       - ./var:/var/www/project/var
     environment:
       DATABASE_URL: "mysql://symfony:password@mysql:3306/symfony?serverVersion=5.7"
-      APP_ENV: prod
+      APP_ENV: dev # Mieux en dev pour le développement
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    networks:
+      - symfony-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8081:80" # Port modifié pour éviter les conflits
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/project
+    depends_on:
+      - php
     networks:
       - symfony-network
 
@@ -27,25 +36,21 @@ services:
       - mysql_data:/var/lib/mysql
     ports:
       - "3307:3306"
-    networks:
-      - symfony-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 10s
       retries: 5
+    networks:
+      - symfony-network
 
   phpmyadmin:
     image: phpmyadmin:latest
-    restart: always
     environment:
       PMA_HOST: mysql
-      PMA_PORT: 3306
-      UPLOAD_LIMIT: 128M
-      environment:
       PMA_USER: symfony
       PMA_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: rootpassword
+      UPLOAD_LIMIT: 128M
     ports:
       - "8080:80"
     depends_on:

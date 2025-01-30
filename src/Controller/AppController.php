@@ -52,7 +52,7 @@ class AppController extends AbstractController
      * 
      * @author Orphée Lié <lieloumloum@gmail.com>
      */
-    #[Route('/api/import-drivingLicense', name: 'import_data', methods: ['POST'])]
+    #[Route('/import-drivingLicense', name: 'import_data', methods: ['POST'])]
     public function importData(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
 
