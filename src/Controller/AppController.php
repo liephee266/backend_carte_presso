@@ -1,20 +1,18 @@
 <?php
 namespace App\Controller;
 
-use App\Services\Toolkit;
-use App\Services\MicroServiceDgtt;
+
 use App\Entity\Second\DrivingLicense;
 use App\Entity\Second\RegistrationCard;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Default\CategorieVehicule;
+use App\Services\Toolkit;
+use App\Services\GenericEntityManager;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Repository\Default\DrivingLicenseRepository;
 use Symfony\Component\Serializer\SerializerInterface;
-use App\Repository\Default\RegistrationCardRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
@@ -23,22 +21,16 @@ class AppController extends AbstractController
 {
 
     private $toolkit;
-    private $defaultEntityManager;
-    private $secondEntityManager;
-    private $serializer;
-    private $microServiceDgtt;
-    private $drivingLicense;
-    private $registrationCard;
-    private $httpClient;
-    private string $firstApiUrl;
+    private $entityManager;
+    private $genericEntityManager;
 
-    public function __construct(EntityManagerInterface $defaultEntityManager, EntityManagerInterface $secondEntityManager, SerializerInterface $serializer)
+
+    public function __construct(EntityManagerInterface $entityManager, Toolkit $toolKit, GenericEntityManager $genericEntityManager)
     {
-        // $this->toolkit = $toolKit;
-        $this->defaultEntityManager = $defaultEntityManager;
-        $this->secondEntityManager = $secondEntityManager;
-        $this->serializer = $serializer;
-        $this->httpClient = HttpClient::create();
+        $this->toolkit = $toolKit;
+        $this->entityManager = $entityManager;
+        $this->genericEntityManager = $genericEntityManager;
+        
         // $this->microServiceDgtt = $microServiceDgtt;
         // $this->drivingLicense = $drivingLicense;
         // $this->registrationCard = $registrationCard;
@@ -70,27 +62,25 @@ class AppController extends AbstractController
 
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
-
-        if (!$data || !isset($data['driving_license'])) {
+        // dd($data);
+        if (!$data || !isset($data['drivingLicense'])) {
             return $this->json(['message' => 'Données manquantes ou format invalide'], 400);
         }
 
         // Traitement des données du permis de conduire
-        $drivingLicenseData = $data['driving_license'];
+        $drivingLicenseData = $data['drivingLicense'];
         $drivingLicense = new DrivingLicense();
-        $drivingLicense->setFirstName($drivingLicenseData['nom']);
-        $drivingLicense->setLastName($drivingLicenseData['prenom']);
-        $drivingLicense->setBirthDate(new \DateTime($drivingLicenseData['birth_date']));
-        $drivingLicense->setBirthPlace($drivingLicenseData['lieu_naissance']);
-        $drivingLicense->setAddress($drivingLicenseData['adresse']);
-        $drivingLicense->setPhone($drivingLicenseData['telephone']);
+        $drivingLicense->setFirstName($drivingLicenseData['first_name']);
+        $drivingLicense->setLastName($drivingLicenseData['last_name']);
+        $drivingLicense->setBirthDate($drivingLicenseData['birth_date']);
+        $drivingLicense->setBirthPlace($drivingLicenseData['birth_place']);
+        $drivingLicense->setAddress($drivingLicenseData['address']);
+        $drivingLicense->setPhone($drivingLicenseData['phone']);
         $drivingLicense->setPhotoUrl($drivingLicenseData['photo_url']);
-        $drivingLicense->setIssueDate($drivingLicenseData['date_delivrance']);
-        $drivingLicense->setCashierShortCode($drivingLicenseData['short_code']);
+        $drivingLicense->setIssueDate($drivingLicenseData['issue_date']);
+        $drivingLicense->setCashierShortCode($drivingLicenseData['cashier_short_code']);
         $drivingLicense->setStatus($drivingLicenseData['status']);
         $drivingLicense->setCodificationCode($drivingLicenseData['codification_code']);
-      
-       
         
         // // Récupération de l'operation_type et de son designation
         // $operationType = $entityManager->getRepository(OperationType::class)
@@ -100,30 +90,14 @@ class AppController extends AbstractController
         // Persister l'entité DrivingLicense
         $entityManager->persist($drivingLicense);
         $entityManager->flush(); // Sauvegarde du permis de conduire
-
         // Gestion des catégories associées
-        if (isset($data['categories']) && is_array($data['categories'])) {
-            foreach ($data['categories'] as $categoryData) {
-                $category = new CategorieVehicule();
-                $category->setClasse($categoryData['classe']);
-                $category->setDescription($tab_classes[$categoryData['classe']] ?? 'Description non définie');
-                $category->setValableDu(new \DateTime($categoryData['valable_du']));
-                
-                // Définir la date jusqu'à laquelle la catégorie est valide (10 ans après la date de validité)
-                $validUntil = new \DateTime($categoryData['valable_du']);
-                $validUntil->modify('+10 years');
-                $category->setJusquAu($validUntil);
-                
-                $entityManager->persist($category);
-            }
-            $entityManager->flush(); // Sauvegarde des catégories
-        }
 
+        $this->genericEntityManager->updateFinalDrivingLicenseWithDataCategory($drivingLicense, $data['categories']);
         return $this->json(['message' => 'Données importées avec succès'], 201);
     }
 
     #[Route('/api/import-registrationCard', name: 'import_registration_card', methods: ['POST'])]
-    public function importData1(Request $request, EntityManagerInterface $entityManager)
+    public function importData1(Request $request)
     {
         
         // Récupérer les données envoyées dans la requête
@@ -154,14 +128,10 @@ class AppController extends AbstractController
         $registrationCard->setPlateNumber($registrationCardData['plate_number']);
         $registrationCard->setVin($registrationCardData['vin']);
         $registrationCard->setStatus($registrationCardData['status']);
-       
 
         // Persister l'entité RegistrationCard
-        $entityManager->persist($registrationCard);
-        $entityManager->flush(); // Sauvegarde de la carte grise
-
-    }
-
-      
+        $this->entityManager->persist($registrationCard);
+        $this->entityManager->flush(); // Sauvegarde de la carte grise
+    }      
 }
 
