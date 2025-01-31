@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository\Second;
+namespace App\Repository;
 
-use App\Entity\Second\DrivingLicense;
+use App\Entity\DrivingLicense;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

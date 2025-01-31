@@ -4,7 +4,7 @@ namespace App\Entity\Default;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Second\DrivingLicense;
+use App\Entity\DrivingLicense;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\Default\CategorieVehiculeRepository;
 

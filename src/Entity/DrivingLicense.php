@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\Second;
+namespace App\Entity;
 
-use App\Repository\Second\DrivingLicenseRepository;
+use App\Repository\DrivingLicenseRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;

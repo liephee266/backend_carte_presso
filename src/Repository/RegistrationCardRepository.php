@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Repository\Second;
+namespace App\Repository;
 
 
-use App\Entity\Second\RegistrationCard;
+use App\Entity\RegistrationCard;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 

@@ -5,7 +5,7 @@ use Pagerfanta\Pagerfanta;
 use App\Entity\Default\User;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Uid\Uuid;
-use App\Entity\Second\DrivingLicense;
+use App\Entity\DrivingLicense;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Symfony\Component\HttpFoundation\Request;

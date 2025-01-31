@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity\Second;
+namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
-use App\Repository\Second\RegistrationCardRepository;
+use App\Repository\RegistrationCardRepository;
 
 #[ORM\Entity(repositoryClass: RegistrationCardRepository::class)]
 class RegistrationCard

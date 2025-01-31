@@ -101,65 +101,67 @@ class GenericEntityManager
     {
         
         foreach ($data_categories as $key => $value) {
-            switch ($value->getClasse()) {
+            // dd($value);
+            switch ($value['classe']) {
                 case 'A1':
                     $final_driving_license->setA1($value['classe']);
                     $final_driving_license->setDescriptionA1($value['description']);
-                    $final_driving_license->setValableDuA1($value['valableDu']);
-                    $final_driving_license->setJusquAuA1($value['jusquAu']);
+                    $final_driving_license->setValableDuA1(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuA1(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleA1($value['ville']);
                     break;
                 case 'A':
                     $final_driving_license->setA($value['classe']);
                     $final_driving_license->setDescriptionA($value['description']);
-                    $final_driving_license->setValableDuA($value['valableDu']);
-                    $final_driving_license->setJusquAuA($value['jusquAu']);
+                    $final_driving_license->setValableDuA(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuA(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleA($value['ville']);
                     break;
                 case 'B':
                     $final_driving_license->setB($value['classe']);
                     $final_driving_license->setDescriptionB($value['description']);
-                    $final_driving_license->setValableDuB($value['valableDu']);
-                    $final_driving_license->setJusquAuB($value['jusquAu']);
+                    $final_driving_license->setValableDuB(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuB(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleB($value['ville']);
                     break;
                 case 'C':
                     $final_driving_license->setC($value['classe']);
                     $final_driving_license->setDescriptionC($value['description']);
-                    $final_driving_license->setValableDuC($value['valableDu']);
-                    $final_driving_license->setJusquAuC($value['jusquAu']);
+                    $final_driving_license->setValableDuC(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuC(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleC($value['ville']);
                     break;
                 case 'D':
                     $final_driving_license->setD($value['classe']);
                     $final_driving_license->setDescriptionD($value['description']);
-                    $final_driving_license->setValableDuD($value['valableDu']);
-                    $final_driving_license->setJusquAuD($value['jusquAu']);
+                    $final_driving_license->setValableDuD(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuD(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleD($value['ville']);
                     break;
                 case'E':
                     $final_driving_license->setE($value['classe']);
                     $final_driving_license->setDescriptionE($value['description']);
-                    $final_driving_license->setValableDuE($value['valableDu']);
-                    $final_driving_license->setJusquAuE($value['jusquAu']);
+                    $final_driving_license->setValableDuE(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuE(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleE($value['ville']);
                     break;
                 case 'F':
                     $final_driving_license->setF($value['classe']);
                     $final_driving_license->setDescriptionF($value['description']);
-                    $final_driving_license->setValableDuF($value['valableDu']);
-                    $final_driving_license->setJusquAuF($value['jusquAu']);
+                    $final_driving_license->setValableDuF(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuF(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleF($value['ville']);
                     break;
                 case 'G':
                     $final_driving_license->setG($value['classe']);
                     $final_driving_license->setDescriptionG($value['description']);
-                    $final_driving_license->setValableDuG($value['valableDu']);
-                    $final_driving_license->setJusquAuG($value['jusquAu']);
+                    $final_driving_license->setValableDuG(new \DateTime($value['valableDu']));
+                    $final_driving_license->setJusquAuG(new \DateTime($value['jusquAu']));
                     $final_driving_license->setVilleG($value['ville']);
                     break;
             }
         }
+        // dd($final_driving_license);
         return $final_driving_license;
     }
 

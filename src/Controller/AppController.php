@@ -2,17 +2,14 @@
 namespace App\Controller;
 
 
-use App\Entity\Second\DrivingLicense;
-use App\Entity\Second\RegistrationCard;
+use App\Entity\DrivingLicense;
+use App\Entity\RegistrationCard;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Default\CategorieVehicule;
 use App\Services\Toolkit;
 use App\Services\GenericEntityManager;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
@@ -45,7 +42,7 @@ class AppController extends AbstractController
      * @author Orphée Lié <lieloumloum@gmail.com>
      */
     #[Route('/import-drivingLicense', name: 'import_data', methods: ['POST'])]
-    public function importData(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function importData(Request $request): JsonResponse
     {
 
         // Les catégories possibles
@@ -72,14 +69,15 @@ class AppController extends AbstractController
         $drivingLicense = new DrivingLicense();
         $drivingLicense->setFirstName($drivingLicenseData['first_name']);
         $drivingLicense->setLastName($drivingLicenseData['last_name']);
-        $drivingLicense->setBirthDate($drivingLicenseData['birth_date']);
+        $drivingLicense->setBirthDate(new \DateTime($drivingLicenseData['birth_date']));
         $drivingLicense->setBirthPlace($drivingLicenseData['birth_place']);
         $drivingLicense->setAddress($drivingLicenseData['address']);
         $drivingLicense->setPhone($drivingLicenseData['phone']);
         $drivingLicense->setPhotoUrl($drivingLicenseData['photo_url']);
-        $drivingLicense->setIssueDate($drivingLicenseData['issue_date']);
+        $drivingLicense->setIssueDate(new \DateTime( $drivingLicenseData['issue_date']));
         $drivingLicense->setCashierShortCode($drivingLicenseData['cashier_short_code']);
         $drivingLicense->setStatus($drivingLicenseData['status']);
+        $drivingLicense->setIssuancePlace($drivingLicenseData['issuance_place']);
         $drivingLicense->setCodificationCode($drivingLicenseData['codification_code']);
         
         // // Récupération de l'operation_type et de son designation
@@ -88,11 +86,11 @@ class AppController extends AbstractController
         // $drivingLicense->setOperationType($operationType ? $operationType->getDesignation() : 'Unknown');
 
         // Persister l'entité DrivingLicense
-        $entityManager->persist($drivingLicense);
-        $entityManager->flush(); // Sauvegarde du permis de conduire
+        $this->entityManager->persist($drivingLicense);
+        $this->entityManager->flush(); // Sauvegarde du permis de conduire
         // Gestion des catégories associées
 
-        $this->genericEntityManager->updateFinalDrivingLicenseWithDataCategory($drivingLicense, $data['categories']);
+        $this->genericEntityManager->updateFinalDrivingLicenseWithDataCategory($drivingLicense, $data['drivingLicense']['categories']);
         return $this->json(['message' => 'Données importées avec succès'], 201);
     }
 
