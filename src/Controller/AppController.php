@@ -44,18 +44,12 @@ class AppController extends AbstractController
     #[Route('/import-drivingLicense', name: 'import_data', methods: ['POST'])]
     public function importData(Request $request): JsonResponse
     {
+        $authorizationHeader = $request->headers->get('Authorization');
+        // $token = substr($authorizationHeader, 7);
 
-        // Les catégories possibles
-        $tab_classes = [
-            "A1" => "Vélomoteur et motocyclettes de cylindres n'excédant pas 125 cm³",
-            "A" => "Motocycles avec ou sans side-car",
-            "B" => "Véhicules max 10 places n'excédant pas 3500 kgs",
-            "C" => "Véhicules à marchandises de plus de 3500 kgs",
-            "D" => "Véhicules de transport en commun de plus de 8 places",
-            "E" => "Remorques de plus de 750 kg pour les cat B, C, D",
-            "F" => "Véhicules de plus de cat B sp totalement aménagés",
-            "G" => "Véhicules et engins travaux publics et agricoles",
-        ];
+        if ($authorizationHeader !== $_ENV['CARD_PRESSO_API_KEY']) {
+            return $this->json(['message' => 'Token invalide'], 401);
+        }
 
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
