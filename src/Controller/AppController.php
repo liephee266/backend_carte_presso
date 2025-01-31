@@ -41,7 +41,7 @@ class AppController extends AbstractController
      * 
      * @author Orphée Lié <lieloumloum@gmail.com>
      */
-    #[Route('/import-drivingLicense/', name: 'import_data', methods: ['POST'])]
+    #[Route('/import-drivingLicense', name: 'import_data', methods: ['POST'])]
     public function importData(Request $request): JsonResponse
     {
         $authorizationHeader = $request->headers->get('Authorization');
@@ -88,19 +88,26 @@ class AppController extends AbstractController
         return $this->json(['message' => 'Données importées avec succès'], 201);
     }
 
-    #[Route('/api/import-registrationCard', name: 'import_registration_card', methods: ['POST'])]
+    /**
+     * Importation des données de la carte grise
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     * 
+     * @author Orphée Lié
+     */
+
+    #[Route('/import-registrationCard', name: 'import_registration_card', methods: ['POST'])]
     public function importData1(Request $request)
     {
-        
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
-
-        if (!$data || !isset($data['registration_card'])) {
+        if (!$data || !isset($data['registrationCard'])) {
             return $this->json(['message' => 'Données manquantes ou format invalide'], 400);
         }
 
         // Traitement des données de la carte grise (RegistrationCard)
-        $registrationCardData = $data['registration_card'];
+        $registrationCardData = $data['registrationCard'];
         $registrationCard = new RegistrationCard();
         $registrationCard->setOwnerFirstName($registrationCardData['owner_first_name']);
         $registrationCard->setOwnerLastName($registrationCardData['owner_last_name']);
@@ -120,13 +127,71 @@ class AppController extends AbstractController
         $registrationCard->setPlateNumber($registrationCardData['plate_number']);
         $registrationCard->setVin($registrationCardData['vin']);
         $registrationCard->setStatus($registrationCardData['status']);
-
+        $registrationCard->setFirstCirculationDate($registrationCardData['first_circulation_date']);
+        $registrationCard->setPreviousReceiptDate($registrationCardData['previous_receipt_date']);
+        $registrationCard->setOperationType($registrationCardData['operation_type']);
+        $registrationCard->setPreviousRegistrationNumber($registrationCardData['previous_registration_number']);
+        $registrationCard->setRegistrationNumber($registrationCardData['registration_number']);
+        $registrationCard->setCreatedAt($registrationCardData['created_at']);
+        $registrationCard->setUpdatedAt($registrationCardData['updated_at']);
         // Persister l'entité RegistrationCard
         $this->entityManager->persist($registrationCard);
         $this->entityManager->flush(); // Sauvegarde de la carte grise
     }
     
-    //#[Route('/api/import-registrationCard', name: 'import_registration_card', methods: ['POST'])]
+    #[Route('/import-status-update-drivingLicense', name: 'import_data_status_update_driving_license', methods: ['POST'])]
+    public function importDataStatut(Request $request)
+    {
+        $authorizationHeader = $request->headers->get('Authorization');
+        // $token = substr($authorizationHeader, 7);
 
+        if ($authorizationHeader !== $_ENV['CARD_PRESSO_API_KEY']) {
+            return $this->json(['message' => 'Token invalide'], 401);
+        }
+
+        // Récupérer les données envoyées dans la requête
+        $data = json_decode($request->getContent(), true);
+        // dd($data);
+        if (!$data || !isset($data['drivingLicense'])) {
+            return $this->json(['message' => 'Données manquantes ou format invalide'], 400);
+        }
+
+        $t = [
+            "drivingLicense" => "\App\Entity\DrivingLicense",
+            "registrationCard" => "\App\Entity\RegistrationCard",
+        ];
+
+        // Traitement des données du permis de conduire
+        foreach ($data['drivingLicense'] as $line) {
+            try {
+                $entity2 = $this->entityManager->getRepository($t[$line['type']])->findOneBy(['cashier_short_code' => $line["cashier_short_code"]]);
+                $entity2->setStatus("1");
+                foreach ($line as $key =>   $file) {
+                    switch ($key) {
+                        case 'finger_print_2':
+                            # code...
+                            $entity2->setFingerPrint2($file);
+                            break;
+                        case 'finger_print_1':
+                            # code...
+                            $entity2->setFingerPrint1($file);
+                            break;
+                        case 'photo_url_signature':
+                            $entity2->setSignatureUrl($file);
+                            break;
+                        case 'photo_url':
+                            $entity2->setPhotoUrl($file);
+                            break;
+                    }
+                }
+                $this->entityManager->persist($entity2);
+                $this->entityManager->flush();
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+        }
+    
+        return $this->json(['message' => 'Données importées avec succès et status mis à jour avec succes'], 201);
+    }
 }
 

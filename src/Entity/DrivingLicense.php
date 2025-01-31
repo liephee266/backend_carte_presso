@@ -47,6 +47,19 @@ class DrivingLicense
     #[Groups(['driving_license:read'])]
     private ?string $photo_url = null;
 
+    #[ORM\Column(nullable: true, type: "text")]
+    #[Groups(["driving_license:read"])]
+    private ?string $finger_print_1 = null;
+
+    #[ORM\Column(nullable: true, type: "text")]
+    #[Groups(["driving_license:read"])]
+    private ?string $finger_print_2 = null;
+
+    
+    #[ORM\Column(nullable: true, type: "text")]
+    #[Groups(["driving_license:read"])]
+    private ?string $signature_url = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(['driving_license:read'])]
     private ?\DateTimeInterface $issue_date = null;
@@ -881,6 +894,43 @@ class DrivingLicense
     {
         $this->ville_G = $ville_G;
 
+        return $this;
+    }
+
+    
+    // Getters and Setters for finger_print_1
+    public function getFingerPrint1(): ?string
+    {
+        return $this->finger_print_1;
+    }
+
+    public function setFingerPrint1(?string $finger_print_1): static
+    {
+        $this->finger_print_1 = $finger_print_1;
+        return $this;
+    }
+
+    // Getters and Setters for finger_print_2
+    public function getFingerPrint2(): ?string
+    {
+        return $this->finger_print_2;
+    }
+
+    public function setFingerPrint2(?string $finger_print_2): static
+    {
+        $this->finger_print_2 = $finger_print_2;
+        return $this;
+    }
+    
+    // Getters and Setters for signature_url
+    public function getSignatureUrl(): ?string
+    {
+        return $this->signature_url;
+    }
+
+    public function setSignatureUrl(?string $signature_url): static
+    {
+        $this->signature_url = $signature_url;
         return $this;
     }
 }
