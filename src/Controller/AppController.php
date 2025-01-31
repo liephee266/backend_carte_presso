@@ -41,7 +41,7 @@ class AppController extends AbstractController
      * 
      * @author Orphée Lié <lieloumloum@gmail.com>
      */
-    #[Route('/import-drivingLicense', name: 'import_data', methods: ['POST'])]
+    #[Route('/import-drivingLicense/', name: 'import_data', methods: ['POST'])]
     public function importData(Request $request): JsonResponse
     {
         $authorizationHeader = $request->headers->get('Authorization');
@@ -124,6 +124,9 @@ class AppController extends AbstractController
         // Persister l'entité RegistrationCard
         $this->entityManager->persist($registrationCard);
         $this->entityManager->flush(); // Sauvegarde de la carte grise
-    }      
+    }
+    
+    //#[Route('/api/import-registrationCard', name: 'import_registration_card', methods: ['POST'])]
+
 }
 
