@@ -74,11 +74,6 @@ class AppController extends AbstractController
         $drivingLicense->setIssuancePlace($drivingLicenseData['issuance_place']);
         $drivingLicense->setCodificationCode($drivingLicenseData['codification_code']);
         
-        // // Récupération de l'operation_type et de son designation
-        // $operationType = $entityManager->getRepository(OperationType::class)
-        //                             ->find($drivingLicenseData['operation_type_id'] ?? 1);
-        // $drivingLicense->setOperationType($operationType ? $operationType->getDesignation() : 'Unknown');
-
         // Persister l'entité DrivingLicense
         $this->entityManager->persist($drivingLicense);
         $this->entityManager->flush(); // Sauvegarde du permis de conduire
